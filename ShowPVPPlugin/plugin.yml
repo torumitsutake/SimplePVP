@@ -1,0 +1,8 @@
+name: PVPPlugin
+main: com.gmail.sitoa.showplugin.pvp.MainClass
+version: 1.0
+
+commands:
+     sp:
+       permission: PVPPlugin.all
+       permission-message: You don't have permission
