@@ -17,23 +17,27 @@ public class ScoreBoardClass {
 	 /** 赤チームの名前 */
     private static final String TEAM_RED_NAME = "team_red";
     /** 青チームの名前 */
-    private static final String TEAM_BLUE_NAME = "team_blue";
+    private static final String TEAM_BLUE_NAME = "team_white";
 
     /** 赤チーム */
     private Team teamRed;
     /** しろチーム */
     private Team teamWhite;
 	private Plugin p = null;
+	private Score redp =null;
+	private Score whitep = null;
+	private Objective tobj = null ;
+	private ScoreboardManager manager = null;
+	private Scoreboard board = null;
 	ScoreBoardClass(){
 		p = MainClass.getInstance();
+	       manager = Bukkit.getScoreboardManager();
+	       board = manager.getMainScoreboard();
 		mainscoreboard();
-
+		sidescore();
 	}
-	public void mainscoreboard(){
+	private  void mainscoreboard(){
 		 // メインスコアボードを取得します。
-        ScoreboardManager manager = Bukkit.getScoreboardManager();
-        Scoreboard board = manager.getMainScoreboard();
-
         // チームが既に登録されているかどうか確認し、
         // 登録されていないなら新規作成します。
          teamRed = board.getTeam(TEAM_RED_NAME);
@@ -47,24 +51,19 @@ public class ScoreBoardClass {
         teamWhite = board.getTeam(TEAM_BLUE_NAME);
         if ( teamWhite == null ) {
         	teamWhite = board.registerNewTeam(TEAM_BLUE_NAME);
-        	teamWhite.setPrefix(ChatColor.BLUE.toString());
+        	teamWhite.setPrefix(ChatColor.WHITE.toString());
         	teamWhite.setSuffix(ChatColor.RESET.toString());
-        	teamWhite.setDisplayName("team blue");
+        	teamWhite.setDisplayName("team white");
         	teamWhite.setAllowFriendlyFire(false);
         }
 	}
-	Score redp =null;
-	Score whitep = null;
-	public void sidescore(){
-        ScoreboardManager manager = Bukkit.getScoreboardManager();
-        Scoreboard board = manager.getNewScoreboard();
-        board.clearSlot(DisplaySlot.SIDEBAR);
-        Objective tobj = board.registerNewObjective("TeamPoint", "dummy");
-        tobj.setDisplaySlot(DisplaySlot.SIDEBAR);
-        Score redp = tobj.getScore(Bukkit.getOfflinePlayer(ChatColor.RED+"Red"));
-        Score whitep = tobj.getScore(Bukkit.getOfflinePlayer(ChatColor.RED+"Red"));
+	private  void sidescore(){
+        tobj = board.registerNewObjective("TeamPoint", "dummy");
+        redp = tobj.getScore(Bukkit.getOfflinePlayer(ChatColor.RED+"Red"));
+        whitep = tobj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE+"White"));
         redp.setScore(0);
         whitep.setScore(0);
+        tobj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
 	}
 	public void addScore(String team,Integer point){
@@ -97,21 +96,24 @@ public class ScoreBoardClass {
 		for(Player target :p.getServer().getOnlinePlayers()){
 			target.teleport(target.getWorld().getSpawnLocation());
 		}
-		ScoreboardManager manager = Bukkit.getScoreboardManager();
-        Scoreboard board = manager.getNewScoreboard();
+        Objective tobj = board.registerNewObjective("TeamPoint", "dummy");
+        redp = tobj.getScore(Bukkit.getOfflinePlayer(ChatColor.RED+"Red"));
+        whitep = tobj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE+"White"));
         board.clearSlot(DisplaySlot.SIDEBAR);
         Objective obj = board.getObjective("TeamPoint");
-        Score redp = obj.getScore(Bukkit.getOfflinePlayer(ChatColor.RED+"Red"));
-        Score whitep = obj.getScore(Bukkit.getOfflinePlayer(ChatColor.RED+"Red"));
         redp.setScore(0);
         whitep.setScore(0);
         obj.unregister();
         Bukkit.getScheduler().cancelAllTasks();
         teamRed.unregister();
         teamWhite.unregister();
-        
+        mainscoreboard();
+        sidescore();
+
 	}
 	public void setScore(String team,Integer point){
+        redp = tobj.getScore(Bukkit.getOfflinePlayer(ChatColor.RED+"Red"));
+        whitep = tobj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE+"White"));
 		if(team.equalsIgnoreCase("red")){
 			redp.setScore(point);
 
@@ -124,12 +126,12 @@ public class ScoreBoardClass {
 
 	public String addPlayer(Player p,String team){
 		if(team.equalsIgnoreCase("white")){
-			teamRed.addPlayer(p);
+			teamWhite.addPlayer(p);
 			HashMap<Player,Integer> players = ListenerClass.getHashMap();
 			players.put(p, 3);
 			return "Whiteに所属しました";
 		}else if(team.equalsIgnoreCase("red")){
-			teamWhite.addPlayer(p);
+			teamRed.addPlayer(p);
 			HashMap<Player,Integer> players = ListenerClass.getHashMap();
 			players.put(p, 3);
 			return "Redに所属しました";

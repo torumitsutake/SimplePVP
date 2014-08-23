@@ -1,10 +1,10 @@
 timer:200
 winpoint:100
 redspawn:
-   x:0
-   y:4
-   z:0
+      x:0
+      y:4
+      z:0
 whitespawn:
-   x:0
-   y:4
-   z:0
+      x:0
+      y:4
+      z:0

@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,21 +15,22 @@ import org.bukkit.scoreboard.Team;
 public class ListenerClass implements Listener{
 	private Plugin p = null;
 	public static HashMap<Player,Integer> playerhp = new HashMap<Player,Integer>();
+	
 	ListenerClass(){
-
-		p.getServer().getPluginManager().registerEvents(this, p);
 		p = MainClass.getInstance();
+		p.getServer().getPluginManager().registerEvents(this, p);
 	}
 
 	@EventHandler
 	public void onPlayerDeathEvent(PlayerDeathEvent e){
 		Player pl = e.getEntity();
+		Bukkit.broadcastMessage(ChatColor.GOLD+pl.getName()+"がやられた");
 		String team ="";
-		Team red = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("red");
-		Team white = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("white");
-		if(red.getPlayers().contains(pl)){
+		Team red = p.getServer().getScoreboardManager().getMainScoreboard().getTeam("red");
+		Team white = p.getServer().getScoreboardManager().getMainScoreboard().getTeam("white");
+		if(red.getPlayers().contains(Bukkit.getOfflinePlayer(pl.getName()))){
 			team = "red";
-		}else if(white.getPlayers().contains(pl)){
+		}else if(white.getPlayers().contains(Bukkit.getOfflinePlayer(pl.getName()))){
 			team = "white";
 		}
 		if(!(team.equalsIgnoreCase(""))){
@@ -38,11 +40,12 @@ public class ListenerClass implements Listener{
 			hp--;
 			if(hp <= 0){
 				pl.teleport(pl.getWorld().getSpawnLocation());
+				Location loc = pl.getWorld().getSpawnLocation();
 				Bukkit.broadcastMessage(ChatColor.GOLD+pl.getName()+"が脱落しました");
-
-				if(red.getPlayers().contains(pl)){
+				p.getServer().dispatchCommand(p.getServer().getConsoleSender(),"spawnpoint "+pl.getName()+" "+loc.getBlockX()+" "+loc.getBlockY()+" "+loc.getBlockZ());
+				if(pl.getDisplayName().equalsIgnoreCase(ChatColor.RED+pl.getName()+"")){
 					red.removePlayer(pl);
-				}else if(white.getPlayers().contains(pl)){
+				}else if(pl.getDisplayName().equalsIgnoreCase(ChatColor.WHITE+pl.getName()+"")){
 					white.removePlayer(pl);
 				}
 
